@@ -30,7 +30,7 @@ def load_artifacts():
     try:
         model = joblib.load(os.path.join("Models", "XGBoost.pkl"))
         input_cols = joblib.load(os.path.join("Metadata", "input_columns.pkl"))
-        unique_vals = joblib.load(os.path.join("Metadata", "Unique_values.pkl"))
+        unique_vals = joblib.load(os.path.join("Metadata", "unique_values.pkl"))
         return model, input_cols, unique_vals
 
     except FileNotFoundError as e:

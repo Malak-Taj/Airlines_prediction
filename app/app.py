@@ -7,6 +7,9 @@ import pandas as pd
 import numpy as np
 import joblib
 
+
+
+
 # Page Configuration
 st.set_page_config(
     page_title="Airline Price Prediction",
@@ -23,12 +26,27 @@ st.divider()
 # Load Model & Metadata
 @st.cache_resource
 def load_artifacts():
-    model = joblib.load("Models/XGBoost.pkl")
-    input_cols = joblib.load("Metadata/input_columns.pkl")
-    unique_vals = joblib.load("Metadata/Unique_values.pkl")
-    return model, input_cols, unique_vals
+    
+    try:
+        model = joblib.load(os.path.join("Models", "XGBoost.pkl"))
+        input_cols = joblib.load(os.path.join("Metadata", "input_columns.pkl"))
+        unique_vals = joblib.load(os.path.join("Metadata", "Unique_values.pkl"))
+        return model, input_cols, unique_vals
+
+    except FileNotFoundError as e:
+        st.error(f"File not found: {e.filename}")
+        return None, None, None
+
+    except Exception as e:
+        st.error(f"Error loading artifacts: {e}")
+        return None, None, None
+
 
 model, input_columns, unique_values = load_artifacts()
+
+# Stop the app if loading fails
+if model is None:
+    st.stop()
 
 # Sidebar Inputs
 st.sidebar.header("Please Enter Flight Details! ")

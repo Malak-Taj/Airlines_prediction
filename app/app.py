@@ -6,10 +6,6 @@ from scr.inference import make_prediction
 import pandas as pd
 import numpy as np
 import joblib
-
-
-
-
 # Page Configuration
 st.set_page_config(
     page_title="Airline Price Prediction",
@@ -23,26 +19,39 @@ st.markdown(
 
 st.divider()
 
-# Load Model & Metadata
 @st.cache_resource
 def load_artifacts():
-    
+   
     try:
-        model = joblib.load(os.path.join("Models", "XGBoost.pkl"))
-        input_cols = joblib.load(os.path.join("Metadata", "input_columns.pkl"))
-        unique_vals = joblib.load(os.path.join("Metadata", "Unique_values.pkl"))
+        # Base directory (parent of app folder)
+        BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+        # Paths to artifacts
+        model_path = os.path.join(BASE_DIR, "Models", "XGBoost.pkl")
+        input_path = os.path.join(BASE_DIR, "Metadata", "input_columns.pkl")
+        unique_path = os.path.join(BASE_DIR, "Metadata", "Unique_values.pkl")
+
+        # Load files
+        model = joblib.load(model_path)
+        input_cols = joblib.load(input_path)
+        unique_vals = joblib.load(unique_path)
+
         return model, input_cols, unique_vals
 
     except FileNotFoundError as e:
-        st.error(f"File not found: {e.filename}")
+        st.error(f"File not found: {e.filename}. Make sure all model and metadata files are present.")
         return None, None, None
 
     except Exception as e:
-        st.error(f"Error loading artifacts: {e}")
+        st.error(f"Error loading artifacts: {str(e)}")
         return None, None, None
 
-
+# Load artifacts
 model, input_columns, unique_values = load_artifacts()
+
+# Stop execution if artifacts failed to load
+if not all([model, input_columns, unique_values]):
+    st.stop()
 
 # Stop the app if loading fails
 if model is None:
